@@ -4,6 +4,8 @@
 
 这篇文章以文档分类问题引出，重点将特征的伯努利分布(Bernoulli)带入朴素贝叶斯模型，熟悉贝叶斯统计的流程和计算。
 
+本文的md源码在这里：[AnBlog/统计和机器学习](https://github.com/Anarion-zuo/AnBlogs/blob/master/统计和机器学习/Ber-NBC.md)
+
 @[TOC](目录)
 
 ## 可以解决的问题
@@ -274,11 +276,11 @@ p(\pi|D)p(\theta_{jc}|D)d\pi d\theta
 $$
 注意到$\theta,\pi$相互独立，这一个空间可以当成两个空间看待：
 $$
-p(\pi|D)d\pi,p(\theta_{jc}|D)d\pi d\theta
+p(\pi_c|D)d\pi_c,p(\theta_{jc}|D)d\theta_{jc}
 $$
 目标的分布的两个部分分别在这两个空间上做积分：
 $$
-p(y=c|D)=\int d\pi\,p(y=c|\pi)p(\pi|D),p(x_j|y=c,D)=\int d\theta\, p(x_j|y=c,\theta_{jc})p(\theta_{jc}|D)
+p(y=c|D)=\int d\pi\,p(y=c|\pi)p(\pi|D),p(x_j|y=c,D)=\int d\theta_{jc}\, p(x_j|y=c,\theta_{jc})p(\theta_{jc}|D)
 $$
 计算$\pi$的空间:
 $$
@@ -304,7 +306,7 @@ $$
 p(x_j=0|y=c,D)=
 \int_0^1 d\theta_{jc}\,(1-\theta_{jc})p(\theta_{jc}|D)=E[1-\theta_{jc}|D]
 $$
-简介地合并以上两种情况：
+简洁地合并以上两种情况：
 $$
 p(x_j|y=c,D)=E[\theta_{jc}|D]^{I(x_j=1)}E[1-\theta_{jc}|D]^{I(x_j=0)}
 $$
