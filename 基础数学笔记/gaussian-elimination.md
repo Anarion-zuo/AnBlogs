@@ -2,7 +2,7 @@
 
 本文透彻讲解高斯消元法的各种意义和过程，不局限于它的解方程功能，探索更深刻的含义。先讲解解方程的过程，再介绍相关的概念、解读背后的原理。如果你已经熟悉使用高斯消元法解方程组，可选择性跳过部分内容。
 
-本文的md源码文件：[AnBlogs](https://github.com/Anarion-zuo/AnBlogs/tree/master/基础数学笔记)
+本文的md源码文件：[AnBlogs](https://github.com/Anarion-zuo/AnBlogs/tree/master/基础数学笔记/gaussian-elimination.md)
 
 [TOC]
 
