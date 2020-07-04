@@ -190,7 +190,7 @@ plt.show()
 
 初始化两个参数为0，得到变化过程，从左下角变化到右上角：
 
-![img](gradient-visual.assets/Sat,%2004%20Jul%202020%20211930.png)
+![img](gradient-visual.assets/batch1.png)
 
 print输出信息为：
 
@@ -200,7 +200,7 @@ iterate times: 10000 , last delta theta: -3.814528753892911e-09 , last delta bia
 
 可以看到，循环是由于超过最大次数而退出的，说明梯度下降的过程还没有完成，算法还没有收敛，存在误差很正常。修改一下，初始化参数为$\theta=4,b=1$，迭代次数为200000，得到变化过程：
 
-![img](gradient-visual.assets/Sat,%2004%20Jul%202020%20213449.png)
+![img](gradient-visual.assets/batch2.png)
 
 print输出信息为：
 
@@ -230,7 +230,7 @@ bias -= deltaBias
 
 设置参数$\theta=0,b=0$，学习率为`1e-4`，迭代次数为100000，得到结果如下：
 
-![img](gradient-visual.assets/Sat,%2004%20Jul%202020%20214829.png)
+![img](gradient-visual.assets/stoch1.png)
 
 print输出信息为：
 
@@ -273,7 +273,7 @@ while True:
 
 设置迭代最大次数为1000，学习率为`1e-5`，参数$\theta=0,b=0$，得到结果如下：
 
-![img](gradient-visual.assets/Sat,%2004%20Jul%202020%20221335.png)
+![img](gradient-visual.assets/stoch-full1.png)
 
 print输出信息：
 
@@ -330,7 +330,7 @@ iterate times: 53
 theta: 3.9999918544283117 bias: 0.0039473413680768685
 ```
 
-![img](gradient-visual.assets/Sat,%2004%20Jul%202020%20232207.png)
+![img](gradient-visual.assets/stoch-full2.png)
 
 收敛迅速，但精度不高。多次尝试，发现和数据的尺度有关。
 
@@ -359,8 +359,8 @@ for power in range(1, 9, 1):
     ...
 ```
 
-得到$\theta,b$收敛情况随$10^n$变化如下：
+得到$\theta$收敛情况随$10^n$变化如下：
 
-![img](gradient-visual.assets/Sat,%2004%20Jul%202020%20232420.png)![img](gradient-visual.assets/Sat,%2004%20Jul%202020%20232430.png)
+![img](gradient-visual.assets/converge1.png)
 
 可以看出，$n>2$之后，算法结果差别不大，但是并非没有差别。
