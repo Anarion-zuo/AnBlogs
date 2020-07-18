@@ -1,3 +1,4 @@
+#! https://zhuanlan.zhihu.com/p/161512134
 # 人话入门贝叶斯统计学
 
 你可能刚学完大学里面喜欢开的「概率论与数理统计」，知道各种各样的分布，听说过中心极限定理，会做一些参数估计。这时候是继续深入统计学的绝佳时机，然而大多数学校到这里就要期末考试了，非有关专业学生不会继续学习这方面课程，非常可惜。
@@ -20,27 +21,17 @@
 
 首先是概率论，如果你的概率论基础不够扎实，可以看MIT公开课：
 
-官网：
+官网：[MIT概率论](https://ocw.mit.edu/resources/res-6-012-introduction-to-probability-spring-2018/)
 
-https://ocw.mit.edu/resources/res-6-012-introduction-to-probability-spring-2018/
-
-b站视频：
-
-https://www.bilibili.com/video/BV1LE411B7ir?from=search&seid=10175626909093542824
+b站视频：[MIT概率论](https://www.bilibili.com/video/BV1LE411B7ir?from=search&seid=10175626909093542824)
 
 进阶统计学，主要讲的是非贝叶斯，后续慢慢讲点贝叶斯：
 
-官网：
+官网：[MIT统计学](https://ocw.mit.edu/courses/mathematics/18-650-statistics-for-applications-fall-2016/)
 
-https://ocw.mit.edu/courses/mathematics/18-650-statistics-for-applications-fall-2016/
+b站：[MIT统计学](https://www.bilibili.com/video/BV1bb411N7B9?from=search&seid=1687106088945504987)
 
-b站：
-
-https://www.bilibili.com/video/BV1bb411N7B9?from=search&seid=1687106088945504987
-
-看完上面两个，基础知识就差不多了。这时候最好可以看书，看著名的机器学习书籍，是以贝叶斯统计为主的：
-
-https://book.douban.com/subject/10758624/
+看完上面两个，基础知识就差不多了。这时候最好可以看书，看著名的机器学习书籍，是以贝叶斯统计为主的：[MLAPP](https://book.douban.com/subject/10758624/) 
 
 推荐在于精而不在于多，能学号以上资源，就是很大的大佬！
 
@@ -182,7 +173,7 @@ p(n|D)=\int p(n,\theta|D)d\theta=\int p(n|\theta,D)p(\theta|D)d\theta
 $$
 带入具体表达式：
 $$
-p(n|D)=\dbinom{N_l}{n}\int \theta^{n}(1-\theta)^{N_l-n}\cdot\theta d\theta
+p(n|D)=\dbinom{N_l}{n}\int \theta^{n}(1-\theta)^{N_l-n}\cdot p(\theta|D) d\theta
 $$
 
 
@@ -200,7 +191,7 @@ $$
 
 $p(D|\theta)$被称作「似然」，是「数据出现的概率」。这和非贝叶斯统计对「似然」定义一致。
 
-数据记作了$D$，其实也就是一系列数据$x^{(1)},…,x^{(N)}$。对于抛硬币的例子，这可能是一系列抛硬币中某面向上的情况。把$D$展开来写，也就是一个维度很高的联合概率密度函数$p(x^{(1)},…,x^{(N)}|\theta)$。如果假设抛硬币之间相互独立，我们就可以吧它展开：
+数据记作了$D$，其实也就是一系列数据$x^{(1)},…,x^{(N)}$。对于抛硬币的例子，这可能是一系列抛硬币中某面向上的情况。把$D$展开来写，也就是一个维度很高的联合概率密度函数$p(x^{(1)},…,x^{(N)}|\theta)$。如果假设抛硬币之间相互独立，我们就可以把它展开：
 $$
 p(x^{(1)},…,x^{(N)}|\theta)=\prod_ip(x^{(i)}|\theta)=\prod_i\theta^{x^{(i)}}(1-\theta)^{1-x^{(i)}}
 $$
@@ -262,7 +253,7 @@ $$
 
 在家里，你随意做出「是否下雨」的猜想，这是「先验」。
 
-走出门，看到一滩水，你得到了一点「数据」，并根据这个数据得到了一个「后验」，更新了你对「是否下雨」的估计。「地上有一滩书」，使得「似然」较大，故可能让你估计的概率变大。
+走出门，看到一滩水，你得到了一点「数据」，并根据这个数据得到了一个「后验」，更新了你对「是否下雨」的估计。「地上有一滩水」，使得「似然」较大，故可能让你估计的概率变大。
 
 又看到洒水车，又没有感受到雨点，收集了一个又一个的数据，不断更新对「是否下雨」的认知。「没有感受到雨点」使得你的似然较小，故对「是否下雨」的估计的概率变得很小。
 
