@@ -1,6 +1,7 @@
+#! https://zhuanlan.zhihu.com/p/168787600
 # MIT 6.828：实现操作系统 | Lab1：看看内核
 
-本文为本人学习60828的Lab笔记，对应Lab1 Part3内容，接续上一篇笔记：https://zhuanlan.zhihu.com/p/166413604
+本文为本人学习6.828的Lab笔记，对应Lab1 Part3内容，接续上一篇笔记：https://zhuanlan.zhihu.com/p/166413604
 
 写成博客的目的是防止自己走马观花，花了一堆时间还什么都没学到。其他Lab的实现在专栏陆续更新。
 
