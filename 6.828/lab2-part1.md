@@ -1,3 +1,5 @@
+#! https://zhuanlan.zhihu.com/p/176967610
+
 # MIT 6.828：实现操作系统 | Lab 2 Part 1：内核内存管理
 
 本文为本人学习6.828的Lab笔记，对应`Lab2 Part1`的内容，接续上一篇笔记：
