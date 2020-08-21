@@ -1,3 +1,4 @@
+#! https://zhuanlan.zhihu.com/p/183974374
 # MIT 6.828：实现操作系统 | Lab 2 Part 2：内核内存映射
 
 本文是本人实现`6.828 Lab 2 Part 2`的笔记，接续上一篇：
