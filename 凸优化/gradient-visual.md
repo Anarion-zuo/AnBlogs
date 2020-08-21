@@ -1,3 +1,4 @@
+#! https://zhuanlan.zhihu.com/p/156215474
 # 玩一玩梯度下降可视化
 
 
