@@ -1,6 +1,8 @@
+#! https://zhuanlan.zhihu.com/p/146927237
+
 # 线性回归和贝叶斯的线性回归
 
-本文源码地址：[AnBlogs]()
+本文源码地址：[AnBlogs](https://github.com/Anarion-zuo/AnBlogs/blob/master/统计和机器学习/Linear-Regression-Bayes-part1.md)
 
 ## 问题是什么
 
@@ -74,9 +76,7 @@ $$
 
 取对数：
 $$
-L(\theta,\sigma)=\ln p(D|\theta,\sigma)=
-\sum_i\ln p(x^{(i)},y^{(i)}|\theta,\sigma)=
--N_D\ln\sigma-N_D\ln\sqrt{2\pi}-\frac{\sum_i(y^{(i)}-\theta^Tx^{(i)})^2}{2\sigma^2}
+L(\theta,\sigma)=\ln p(D|\theta,\sigma)=\sum_i\ln p(x^{(i)},y^{(i)}|\theta,\sigma)=-N_D\ln\sigma-N_D\ln\sqrt{2\pi}-\frac{\sum_i(y^{(i)}-\theta^Tx^{(i)})^2}{2\sigma^2}
 $$
 参数$\sigma$：
 $$
@@ -96,9 +96,7 @@ $$
 $$
 矩阵形式可以简化：
 $$
-\sum_iy^{(i)}x^{(i)}_j=y^Tx_j,\sum_ix^{(i)}x_j^{(i)}=Xx
-\Rightarrow
-y^Tx_j=\theta^TXx
+\sum_iy^{(i)}x^{(i)}_j=y^Tx_j,\sum_ix^{(i)}x_j^{(i)}=Xx\Rightarrow y^Tx_j=\theta^TXx
 $$
 可以通过解这个线性方程组直接得出训练结果。
 
@@ -122,19 +120,14 @@ $$
 
 把似然乘上刚才写的先验：
 $$
-p(\theta,\sigma|D)\propto
-\frac{1}{(\sqrt{2\pi}\sigma)^{N_D}\sqrt{2\pi}\sigma_j}
-\exp(-\frac{\sum_i(y^{(i)}-\theta^Tx^{(i)})^2}{2\sigma^2}-
-\sum_j\frac{(\theta_j-\mu_j)^2}{2\sigma_j^2})
+p(\theta,\sigma|D)\propto\frac{1}{(\sqrt{2\pi}\sigma)^{N_D}\sqrt{2\pi}\sigma_j}\exp(-\frac{\sum_i(y^{(i)}-\theta^Tx^{(i)})^2}{2\sigma^2}-\sum_j\frac{(\theta_j-\mu_j)^2}{2\sigma_j^2})
 $$
 
 ### 最大后验估计(MAP)
 
 取对数，省略一些不必要的项：
 $$
-L(\theta)=\ln p(\theta,\sigma|D)=
--\frac{\sum_i(y^{(i)}-\theta^Tx^{(i)})^2}{2\sigma^2}
--\sum_j\frac{(\theta_j-\mu_j)^2}{2\sigma_j^2}
+L(\theta)=\ln p(\theta,\sigma|D)=-\frac{\sum_i(y^{(i)}-\theta^Tx^{(i)})^2}{2\sigma^2}-\sum_j\frac{(\theta_j-\mu_j)^2}{2\sigma_j^2}
 $$
 求导：
 $$

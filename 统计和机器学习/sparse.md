@@ -221,7 +221,7 @@ $$
 $$
 w_j=\begin{cases}0&c_j\in[-\lambda,\lambda]\\\frac{c_j+\lambda}{a_j}&c_j<-\lambda\\\frac{c_j-\lambda}{a_j}&c_j>\lambda\end{cases}
 $$
-Lasso有解析解，只要计算出$a_j,c_j$，就可以得到模型的训练结果。
+Lasso有解析解，只要计算出$a_j,c_j$，就可以得到模型的训练结果。可见，$\lambda$越大，模型就越「稀疏」。
 
 #### 避免缩小绝对值的取法
 

@@ -1,3 +1,5 @@
+#! https://zhuanlan.zhihu.com/p/146934905
+
 # 「伯努利分布+朴素贝叶斯」分类器
 
 在神经网络技术还不成熟的时候，朴素贝叶斯分类器(NBC)是文档分类的利器。即便是在神经网络满地走的今天，朴素贝叶斯模型依然有很大的价值。进行文档分类时，这个模型只需要进行几次简单的循环，就可以给出结果，在一些对结果要求不是特别高、对性能要求很高的场景下，具有很大的价值。
@@ -136,8 +138,7 @@ $$
 
 求和：
 $$
-\sum_{i:y^{(i)}=c}(\frac{x_j^{(i)}}{\theta_{jc}}-\frac{1-x_j^{(i)}}{1-\theta_{jc}})=
-\frac{\sum_{i:y^{(i)}=c}x_j^{(i)}}{\theta_{jc}}-\frac{N_c-\sum_{i:y^{(i)}=c}x_j^{(i)}}{1-\theta_{jc}}
+\sum_{i:y^{(i)}=c}(\frac{x_j^{(i)}}{\theta_{jc}}-\frac{1-x_j^{(i)}}{1-\theta_{jc}})=\frac{\sum_{i:y^{(i)}=c}x_j^{(i)}}{\theta_{jc}}-\frac{N_c-\sum_{i:y^{(i)}=c}x_j^{(i)}}{1-\theta_{jc}}
 $$
 引入新的计数变量，带入：
 $$
@@ -167,9 +168,7 @@ $$
 
 后验表达式：
 $$
-p(\theta,\pi|D)\propto 
-p(D|\theta,\pi)p(\theta)p(\pi)=
-p(\theta)p(\pi)\prod_ip(x^{(i)}|\theta)p(y^{(i)} |\pi)
+p(\theta,\pi|D)\propto p(D|\theta,\pi)p(\theta)p(\pi)=p(\theta)p(\pi)\prod_ip(x^{(i)}|\theta)p(y^{(i)} |\pi)
 $$
 参数$\pi$:
 $$
@@ -177,8 +176,7 @@ p(\pi|D)\propto p(\pi)\prod_ip(y^{(i)}|\pi)=\prod_c\pi_c^{N_c+\beta_c-1}
 $$
 归一化系数：
 $$
-\frac{1}{Z_\pi}=\int\prod_c\pi_c^{N_c+\beta_c-1}d\pi=
-\prod_c\int_0^1\pi_c^{N_c+\beta_c-1}d\pi_c=\prod_c\frac{1}{N_c+\beta_c}
+\frac{1}{Z_\pi}=\int\prod_c\pi_c^{N_c+\beta_c-1}d\pi=\prod_c\int_0^1\pi_c^{N_c+\beta_c-1}d\pi_c=\prod_c\frac{1}{N_c+\beta_c}
 $$
 算一下：
 $$
@@ -204,8 +202,7 @@ E[\theta_{jc}|D]=Z_{\theta_{jc}}\int_0^1 d\theta_{jc}\,\theta_{jc}\theta_{jc}^{N
 $$
 带入$\Gamma$函数的性质：
 $$
-\frac{B(N_{jc}+a_{jc}+1,N_c-N_{jc}+b_{jc})}{B(N_{jc}+a_{jc},N_c-N_{jc}+b_{jc})}=
-\frac{\Gamma(N_{jc}+a_{jc}+1)\Gamma(N_c-N_{jc}+b_{jc})}{\Gamma(N_{jc}+a_{jc})\Gamma(N_c-N_{jc}+b_{jc})}\frac{\Gamma(N_c+a_{jc}+b_{jc})}{\Gamma(N_c+a_{jc}+b_{jc}+1)}=\frac{N_{jc}+a_{jc}}{N_{jc}+a_{jc}+b_{jc}}
+\frac{B(N_{jc}+a_{jc}+1,N_c-N_{jc}+b_{jc})}{B(N_{jc}+a_{jc},N_c-N_{jc}+b_{jc})}=\frac{\Gamma(N_{jc}+a_{jc}+1)\Gamma(N_c-N_{jc}+b_{jc})}{\Gamma(N_{jc}+a_{jc})\Gamma(N_c-N_{jc}+b_{jc})}\frac{\Gamma(N_c+a_{jc}+b_{jc})}{\Gamma(N_c+a_{jc}+b_{jc}+1)}=\frac{N_{jc}+a_{jc}}{N_{jc}+a_{jc}+b_{jc}}
 $$
 同样算一下共轭的均值(这样是叫共轭吗？)：
 $$
@@ -239,9 +236,7 @@ N+\sum_c\beta_c-N_D=\lambda\Rightarrow\hat\pi_c=\frac{N_c+\beta_c-1}{N+\sum_c\be
 $$
 参数$\theta$:
 $$
-\frac{\partial}{\partial \theta_{jc}}L(\theta,\pi)=
-\frac{a_{jc}-1}{\theta_{jc}}-\frac{b_{jc}-1}{1-\theta_{jc}}+\sum_{i:y^{(i)}=c}(\frac{x_j^{(i)}}{\theta_{jc}}-\frac{1-x_j^{(i)}}{1-\theta_{jc}})=
-\frac{N_{jc}+a_{jc}-1}{\theta_{jc}}-\frac{N_c-N_{jc}+b_{jc}-1}{1-\theta_{jc}}
+\frac{\partial}{\partial \theta_{jc}}L(\theta,\pi)=\frac{a_{jc}-1}{\theta_{jc}}-\frac{b_{jc}-1}{1-\theta_{jc}}+\sum_{i:y^{(i)}=c}(\frac{x_j^{(i)}}{\theta_{jc}}-\frac{1-x_j^{(i)}}{1-\theta_{jc}})=\frac{N_{jc}+a_{jc}-1}{\theta_{jc}}-\frac{N_c-N_{jc}+b_{jc}-1}{1-\theta_{jc}}
 $$
 
 求出来：
@@ -284,27 +279,22 @@ p(y=c|D)=\int d\pi\,p(y=c|\pi)p(\pi|D),p(x_j|y=c,D)=\int d\theta_{jc}\, p(x_j|y=
 $$
 计算$\pi$的空间:
 $$
-p(y=c|D)=\int d\pi\,\pi_c Z_\pi\prod_{c'}\pi_{c'}^{N_{c'}+\beta_{c'}-1}=
-Z_\pi(\int_0^1d\pi_c\,\pi_c^{N_c+\beta_c})(\prod_{c'\ne c}\int_0^1d\pi_{c'}\,\pi_{c'}^{N_{c'}+\beta_{c'}-1})=
-Z_\pi\frac{1}{N_c+\beta_c+1}\prod_{c'\ne c}\frac{1}{N_{c'}+\beta_{c'}}=1-\frac{1}{N_c+\beta_c+1}
+p(y=c|D)=\int d\pi\,\pi_c Z_\pi\prod_{c'}\pi_{c'}^{N_{c'}+\beta_{c'}-1}=Z_\pi(\int_0^1d\pi_c\,\pi_c^{N_c+\beta_c})(\prod_{c'\ne c}\int_0^1d\pi_{c'}\,\pi_{c'}^{N_{c'}+\beta_{c'}-1})=Z_\pi\frac{1}{N_c+\beta_c+1}\prod_{c'\ne c}\frac{1}{N_{c'}+\beta_{c'}}=1-\frac{1}{N_c+\beta_c+1}
 $$
 计算$\theta$的空间:
 $$
 p(x_j|y=c,D)=
-Z_{\theta_{jc}}\int_0^1 d\theta_{jc}\,\theta_{jc}^{x_j}(1-\theta_{jc})^{1-x_j}\theta_{jc}^{N_{jc}+a_{jc}-1}(1-\theta_{jc})^{N_c-N_{jc}+b_{jc}-1}=
-\frac{B(x_j+N_{jc}+a_{jc},1-x_j+N_c-N_{jc}+b_{jc})}{B(N_{jc}+a_{jc},N_c-N_{jc}+b_{jc})}
+Z_{\theta_{jc}}\int_0^1 d\theta_{jc}\,\theta_{jc}^{x_j}(1-\theta_{jc})^{1-x_j}\theta_{jc}^{N_{jc}+a_{jc}-1}(1-\theta_{jc})^{N_c-N_{jc}+b_{jc}-1}=\frac{B(x_j+N_{jc}+a_{jc},1-x_j+N_c-N_{jc}+b_{jc})}{B(N_{jc}+a_{jc},N_c-N_{jc}+b_{jc})}
 $$
 上式过于庞杂，考虑到$x_j$取值十分有限，可以简化一下，分别计算。
 
 $x_j=1$时，是在求均值，刚才算过了：
 $$
-p(x_j=1|y=c,D)=
-\int_0^1 d\theta_{jc}\,\theta_{jc}p(\theta_{jc}|D)=E[\theta_{jc}|D]
+p(x_j=1|y=c,D)=\int_0^1 d\theta_{jc}\,\theta_{jc}p(\theta_{jc}|D)=E[\theta_{jc}|D]
 $$
 $x_j=0$时，还是在求均值：
 $$
-p(x_j=0|y=c,D)=
-\int_0^1 d\theta_{jc}\,(1-\theta_{jc})p(\theta_{jc}|D)=E[1-\theta_{jc}|D]
+p(x_j=0|y=c,D)=\int_0^1 d\theta_{jc}\,(1-\theta_{jc})p(\theta_{jc}|D)=E[1-\theta_{jc}|D]
 $$
 简洁地合并以上两种情况：
 $$

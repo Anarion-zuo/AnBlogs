@@ -1,3 +1,4 @@
+#! https://zhuanlan.zhihu.com/p/148651205
 # 线性分类器：Logistic回归
 
 本文讲解Logistic回归的基本统计学计算，只进行到最大似然估计，估计后验等计算过于复杂而暂不进行。
