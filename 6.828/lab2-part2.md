@@ -150,7 +150,7 @@ uintptr_t pgoff = PGOFF(va);   // page frame index
 拿到索引就可以取出相应`entry`了。先取出`page table entry`。
 
 ```c
-pde_t *pde = &kern_pgdir[pdx];
+pde_t *pde = &pgdir[pdx];
 ```
 
 注释中要求了先要检查当前`page table`是否存在，不存在就要根据函数参数的要求创建一个。若`create`参数非0， 则是要创建新的`page table`。
@@ -239,7 +239,7 @@ pgdir_walk(pde_t *pgdir, const void *va, int create)
      * I now use the indices to index the tables.
      */
     // indexing page directory
-    pde_t *pde = &kern_pgdir[pdx];
+    pde_t *pde = &pgdir[pdx];
 
     /*
      * The page table information is obtained.
