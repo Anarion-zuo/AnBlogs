@@ -13,6 +13,8 @@ https://zhuanlan.zhihu.com/p/166413604
 
 如果你还没有完成`Lab 3A`之前的`Lab`，包括这个`Exercise 2`的`env_setup_vm`函数，请务必完成。鉴于本文涉及的内容没有直接的测试函数，我也没有自己进行任何形式的测试，故本文可能有错误。但`Lab`后续内容会很快验证本文的正确性，若发现错误将第一时间前来更正。
 
+【更新】果然有错误，错误还不小，主要在**加载ELF**这个标题下，已经更改为正确版本。当然，不排除将来还会有改动。测试是多么重要。
+
 本文md文档源码链接：[AnBlogs](https://github.com/Anarion-zuo/AnBlogs/blob/master/6.828/lab2-3A-elf.md)
 
 # 任务总览
@@ -64,6 +66,14 @@ struct Elf {
 -   `ELF`镜像中的**虚拟地址**指的是用户地址空间，而不是当前采用的内核地址空间，需要把指定的用户地址空间换算为内核地址空间，再进行拷贝。
 -   可以参考**内核引导器**的代码。
 
+在本文之前的一个版本中，我专门写了函数`memcpy_pgdir, memset_pgdir`，通过前几个`Lab`的`page_*`函数手动进行用户地址映射。这是我对`x86`地址映射机制理解不足导致的，现已更改为更加优雅的版本。
+
+`x86`可以非常方便地切换`Page Directory`，只要修改寄存器`cr3`就可以触发切换。项目中提供了`lcr3`函数，方便进行这一操作。在开始拷贝`ProgHdr`对应的区块之前，先将地址映射切换为用户的，而不是继续使用内核的。这样可以方便地利用`memset, memcpy`对长区间进行操作。
+
+我们能这样做的原因是，用户地址映射继承自内核地址映射，依旧能够使用原内核地址映射的配置。而当前正处在内核态下，访问内核区的地址没有对用户态的限制。
+
+故在遍历`struct ProgHdr`之前，先切换至用户地址空间`e->env_pgdir`，之后切换回内核地址空间`kern_pgdir`。
+
 我的代码如下：
 
 ```c
@@ -77,23 +87,23 @@ load_icode(struct Env *e, uint8_t *binary)
 	// load each segment
 	struct Proghdr *ph = (struct Proghdr *)(binary + elfHeader->e_phoff), *phEnd = ph + elfHeader->e_phnum;
 	for (; ph < phEnd; ++ph) {
-	    if (ph->p_type != ELF_PROG_LOAD) {
-	        // does not load this type according to Hints
+        if (ph->p_type != ELF_PROG_LOAD) {
+            // does not load this type according to Hints
             continue;
-	    }
-	    // read information on mapping
-	    void *va = (void *)ph->p_va;
-	    uint32_t memsz = ph->p_memsz, filesz = ph->p_filesz;
-	    if (memsz < filesz) {
-	        panic("ELF size in memory less than size in file...\n");
-	    }
-        region_alloc(e, va, memsz);
-
-	    // The current state uses not the page directory of the building environment, therefore must be dealt with caution.
-	    // These 2 functions are for cross-pgdir memory copying & setting.
-	    memcpy_pgdir(e->env_pgdir, va, binary + ph->p_offset, filesz);
-	    memset_pgdir(e->env_pgdir, va + filesz, memsz - filesz, 0);
-	}
+        }
+        // read information on mapping
+        if (ph->p_memsz < ph->p_filesz) {
+            panic("ELF size in memory less than size in file...\n");
+        }
+        // allocate space before copying
+        region_alloc(e, (void *)ph->p_va, ph->p_memsz);
+        // copy to virtual address
+        memcpy((void *)ph->p_va, binary + ph->p_offset, ph->p_filesz);
+        // set the rest to 0s according to Hints
+        memset((void *)(ph->p_va + ph->p_filesz), 0, ph->p_memsz - ph->p_filesz);
+    }
+    // switch back to kernel address mappings
+    lcr3(PADDR(kern_pgdir));
     // set runnable status
     e->env_status = ENV_RUNNABLE;
 	// set entry in trap frame
@@ -102,19 +112,18 @@ load_icode(struct Env *e, uint8_t *binary)
 
 	// Now map one page for the program's initial stack
 	// at virtual address USTACKTOP - PGSIZE.
-
-	page_insert(e->env_pgdir, page_alloc(ALLOC_ZERO), (void *)(USTACKTOP - PGSIZE), PGSIZE);
+	region_alloc(e, (void *)(USTACKTOP - PGSIZE), PGSIZE);
 }
 ```
 
-代码获得了`ProgHdr`数组之后，遍历这个数组，根据`ProgHdr`结构体们的取值把`ELF`镜像加载到指定区域。
+遍历`struct ProgHdr`的数组，根据`ProgHdr`结构体们的取值把`ELF`镜像加载到指定区域。
 
 -   判断这个`ProgHdr`是否要求加载对应的区块。
 -   将二进制代码通过参数指针`binary`拷贝到由`e->env_pgdir`定义的地址`va`下。
 -   设置进程为可运行的，设置进程入口地址为`ELF`文件中指定好的地址。
 -   为进程准备一个栈，映射用户地址空间到虚拟地址`USTACKTOP`。
 
-用到了`region_alloc, memcpy_pgdir, memset_pgdir`几个函数，我们接着来看。
+用到了`region_alloc`函数，我们接着来看。
 
 ## 为进程分配一段内存
 
@@ -133,6 +142,10 @@ region_alloc(struct Env *e, void *va, size_t len)
 	}
 	void *rva = ROUNDDOWN(va, PGSIZE);
 	void *rva_end = ROUNDUP(va + len, PGSIZE);
+    // corner case: rva_end overflows
+	if (rva > rva_end) {
+	    panic("region_alloc: requesting length too large.\n");
+	}
 	for (; rva < rva_end; rva += PGSIZE) {
 	    struct PageInfo *pp = page_alloc(0);
 	    if (pp == NULL) {
@@ -148,6 +161,8 @@ region_alloc(struct Env *e, void *va, size_t len)
 ```
 
 需要注意的是`7-8`的`roundup, rounddown`，不能直接拿`len`来`roundup`。
+
+边界情况就是输入的数值不正确，超出了`32-bit`范围，发生溢出`overflow`。
 
 ## 拷贝进另一个地址空间
 
@@ -229,4 +244,35 @@ env_run(struct Env *e)
 
 还是不能全信`check_*`啊。
 
+## 仔细看看最后执行的几个指令`env_pop_tf`
+
+函数`env_pop_tf`接受一个指针，包含了和进程有关的信息。函数做了这些事情：
+
+1.  将栈寄存器`esp`设置为参数`tf`指针的值。
+2.  基于刚刚设置的`esp`调用`popa`，把`tf`指向的属性`tf_regs`装载到指定寄存器上。
+3.  跳过一些属性。
+4.  `iret`触发中断。
+
+函数中的汇编代码是行内嵌入的`inline assembly`，不同编译器的处理可能不相同，`gcc`以及对应的`GNU Assembler`的规则可以参考[Extended Asm](https://gcc.gnu.org/onlinedocs/gcc-6.3.0/gcc/Extended-Asm.html)。把函数`env_pop_tf`中的汇编代码整理如下：
+
+```assembly
+movl %0, %esp
+popal
+popl %es
+popl %ds
+addl $0x8, %esp
+iret
+```
+
+指令`popa`从栈上按一定顺序取值，并分配到各个寄存器中。它对应的指令是`pusha`，也就是把当前所有寄存器的指令压入栈中。它们都是精简的指令，十分方便，需要注意的是要维持正确的顺序，否则寄存器不能得到对应的值。
+
+顺序问题已经由项目中已有代码解决了，文件`inc/trap.h`中声明的`struct PushRegs`结构体，声明属性的顺序和`popa`弹出的顺序一致。若一个`PushRegs`结构体存在于栈上，弹出之后，对应的值会正确地去到对应的寄存器。
+
+将`esp`的值设置为一个不是栈的地址，就是要方便地执行`popa`操作。`popa`之后，`esp`的值为用户栈顶`USTACKTOP`。
+
+要详细观察中断发生之前的行为，可以在函数`env_pop_tf`开头设置断点，利用`si`指令一个个指令向前走，最终会正确地来到在`user/hello.c`编写的函数中。
+
+由于`trap`还没有正确配置，不能从用户态进入内核态，故在`hello.c`调用函数`cprintf`的时候无法正确执行。可以通过`break`指令在要触发终端的`int`指令之前打断点，以确定整个加载进程的过程是正确的。
+
 后面的实现见下回分解。
+
