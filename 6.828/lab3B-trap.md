@@ -13,7 +13,7 @@
 
 ![思维导图](lab3B-trap.assets/mind.png)
 
-本文md文档源码链接：[AnBlogs](https://github.com/Anarion-zuo/AnBlogs/blob/master/6.828/lab2-3A-trap.md)
+本文md文档源码链接：[AnBlogs](https://github.com/Anarion-zuo/AnBlogs/blob/master/6.828/lab2-3B-trap.md)
 
 # `x86`中断行为
 
