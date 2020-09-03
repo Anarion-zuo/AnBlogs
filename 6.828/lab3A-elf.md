@@ -164,45 +164,6 @@ region_alloc(struct Env *e, void *va, size_t len)
 
 边界情况就是输入的数值不正确，超出了`32-bit`范围，发生溢出`overflow`。
 
-## 拷贝进另一个地址空间
-
-两个函数`memcpy_pgdir, memset_pgdir`都是用于处理内存的，用于把区块们搬运到正确的地方。由于目标`dst`的**地址空间**不同，需要把**用户地址**翻译成**内核地址**，故单独把功能拿出来做了这两个函数。
-
-进程拿着的每个`page`在用户地址空间中是连续的，但在内核地址空间中不一定连续，故需要对每个涉及到的地址进行操作。我的代码如下：
-
-```c
-static void memcpy_pgdir(pde_t *pgdir, void *va_begin, void *src, size_t copyingSize) {
-    size_t binaryOffset = 0;
-    void *va = va_begin;
-    while (copyingSize > 0) {
-        struct PageInfo *pageInfo = page_lookup(pgdir, va, NULL);
-        size_t pgoff = PGOFF(va);
-        size_t step = PGSIZE - pgoff;
-        if (step > copyingSize) {
-            step = copyingSize;
-        }
-        memcpy(page2kva(pageInfo) + pgoff, src + binaryOffset, step);
-        copyingSize -= step;
-        binaryOffset += step;
-        va += step;
-    }
-}
-static void memset_pgdir(pde_t *pgdir, void *va_begin, size_t settingSize, int c) {
-    void *va = va_begin;
-    while (settingSize > 0) {
-        struct PageInfo *pageInfo = page_lookup(pgdir, va, NULL);
-        size_t pgoff = PGOFF(va);
-        size_t step = PGSIZE - pgoff;
-        if (step > settingSize) {
-            step = settingSize;
-        }
-        memset(page2kva(pageInfo) + pgoff, c, step);
-        settingSize -= step;
-        va += step;
-    }
-}
-```
-
 # 上下文切换`Context Switch`
 
 函数`env_run`是上下文切换的一部分，其他部分有待实现。这个函数接受一个`struct Env`对象，让CPU从内核切换到这个`Env`代表的进程。主要包括以下操作：
@@ -249,14 +210,13 @@ env_run(struct Env *e)
 函数`env_pop_tf`接受一个指针，包含了和进程有关的信息。函数做了这些事情：
 
 1.  将栈寄存器`esp`设置为参数`tf`指针的值。
-2.  基于刚刚设置的`esp`调用`popa`，把`tf`指向的属性`tf_regs`装载到指定寄存器上。
-3.  跳过一些属性。
-4.  `iret`触发中断。
+2.  基于刚刚设置的`esp`，进行一系列`pop`操作，创造中断栈形式。
+3.  `iret`触发中断返回。
 
 函数中的汇编代码是行内嵌入的`inline assembly`，不同编译器的处理可能不相同，`gcc`以及对应的`GNU Assembler`的规则可以参考[Extended Asm](https://gcc.gnu.org/onlinedocs/gcc-6.3.0/gcc/Extended-Asm.html)。把函数`env_pop_tf`中的汇编代码整理如下：
 
 ```assembly
-movl %0, %esp
+movl tf, %esp
 popal
 popl %es
 popl %ds
@@ -266,13 +226,24 @@ iret
 
 指令`popa`从栈上按一定顺序取值，并分配到各个寄存器中。它对应的指令是`pusha`，也就是把当前所有寄存器的指令压入栈中。它们都是精简的指令，十分方便，需要注意的是要维持正确的顺序，否则寄存器不能得到对应的值。
 
-顺序问题已经由项目中已有代码解决了，文件`inc/trap.h`中声明的`struct PushRegs`结构体，声明属性的顺序和`popa`弹出的顺序一致。若一个`PushRegs`结构体存在于栈上，弹出之后，对应的值会正确地去到对应的寄存器。
-
-将`esp`的值设置为一个不是栈的地址，就是要方便地执行`popa`操作。`popa`之后，`esp`的值为用户栈顶`USTACKTOP`。
+顺序问题已经由项目中已有代码解决了，文件`inc/trap.h`中声明的`struct PushRegs`结构体，声明属性的顺序和`popa`弹出的顺序一致。若一个`PushRegs`结构体存在于栈上，弹出之后，对应的值会正确地去到对应的寄存器。将`esp`的值设置为一个不是栈的地址，就是要方便地执行`popa`操作。
 
 要详细观察中断发生之前的行为，可以在函数`env_pop_tf`开头设置断点，利用`si`指令一个个指令向前走，最终会正确地来到在`user/hello.c`编写的函数中。
 
-由于`trap`还没有正确配置，不能从用户态进入内核态，故在`hello.c`调用函数`cprintf`的时候无法正确执行。可以通过`break`指令在要触发终端的`int`指令之前打断点，以确定整个加载进程的过程是正确的。
+由于`trap`还没有正确配置，不能从用户态进入内核态，故在`hello.c`调用函数`cprintf`的时候无法正确执行。可以通过`break`指令在要触发中断的`int`指令之前打断点，以确定整个加载进程的过程是正确的。
 
-后面的实现见下回分解。
+## 利用中断返回跳转到进程
 
+函数`env_run`中配置好进程有关的结构体后，就要把处理器控制权交给进程。这是由`iret`指令实现的。
+
+中断发生时，处理器将一些信息压栈，正如`call`指令也会压栈一样，就是为了方便中断处理完成后，返回到之前执行的指令。压栈后的栈结构如下：
+
+![Stack Layout](lab3A-elf.assets/stack-layout.jpg)
+
+其中`Error Code`的存在我们暂时不关心，不影响这里的理解。
+
+`iret`指令执行时，根据栈上寄存器的值，就可以恢复原先指令的执行。`eip`为指令地址，`esp`为栈顶地址，分别将这两个值恢复到寄存器，就可以进行切换。利用`iret`指令的行为，我们可以手动制造一个栈，从而更加自由地进行切换和跳转。
+
+仔细对比`struct Trapframe`的结构，可以发现，在函数`env_pop_tf`中，先进行的几次`pop`操作，将`uint32_t tf_trapno`之前的几个属性弹出了，紧接着的是`tf_err`，也就是`error code`。再依次对比结构体后面的属性，和中断栈上的顺序一致。`iret`就是基于这样产生的**栈**进行了**假的中断返回**。
+
+可以试着进行一些验证。在进入`env_pop_tf`之前，看看结构体各个属性的值，再看看`iret`之后各个寄存器的值。
