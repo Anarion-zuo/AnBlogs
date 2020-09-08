@@ -106,7 +106,7 @@ ts.ts_iomb = sizeof(struct Taskstate);
 
 然后把这个`Task State Segment`装载进`Global Segment Table`。回想`Segment Table Selector`的格式如下：
 
-![Segment Selector](lab3A-trap.assets/segment-selector.gif)
+![Segment Selector](lab3B-trap.assets/segment-selector.gif)
 
 宏`GD_TSS0`定义了`Task State Segment`对应的**选择器**，要获得对`gdt`的索引，需要右移3位，如下：
 
