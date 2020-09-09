@@ -1,5 +1,5 @@
 #! https://zhuanlan.zhihu.com/p/213873367
-# MIT 6.828：实现操作系统 | Lab 3B：中断初始化和系统调用
+# MIT 6.828：实现操作系统 | Lab 3A：中断初始化
 
 本文为本人实现`6.828 Lab`的笔记，接续上一篇：
 
@@ -13,7 +13,7 @@
 
 ![思维导图](lab3B-trap.assets/mind.png)
 
-本文md文档源码链接：[AnBlogs](https://github.com/Anarion-zuo/AnBlogs/blob/master/6.828/lab3B-trap.md)
+本文md文档源码链接：[AnBlogs](https://github.com/Anarion-zuo/AnBlogs/blob/master/6.828/lab3A-trap.md)
 
 # `x86`中断行为
 
