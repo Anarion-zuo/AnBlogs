@@ -20,6 +20,14 @@
 
 本文md文档源码链接：[AnBlogs](https://github.com/Anarion-zuo/AnBlogs/blob/master/6.828/lab1.md)
 
+【更新 2020.9.9】
+
+我开**新坑**了：[CS143：编译原理 | 环境搭建HelloWorld](https://zhuanlan.zhihu.com/p/226190284)
+
+**感谢各位捧场**。
+
+![Yoda talking about Compilers](../cs143/face.jpeg)
+
 【更新 2020.8.29 凌晨】
 
 明天就要开学，现在的脑瓜昏昏欲睡，本来想看看`The Go Programming Language`也看不进去了，来修饰一下之前写的博客。从发出本文到现在已经将近一个月了，随着`Lab`的推进，我对这个项目的理解更加深刻。回头再来看这篇文章，发现了很多非常不专业的表述，一一修正了。
