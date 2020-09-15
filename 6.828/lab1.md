@@ -20,6 +20,28 @@
 
 本文md文档源码链接：[AnBlogs](https://github.com/Anarion-zuo/AnBlogs/blob/master/6.828/lab1.md)
 
+【更新 2020.9.15】
+
+承蒙同学们厚爱，本文及其有关文章收获了很多赞、喜欢、收藏、关注等等流量指标。在此将和本文有关的文章链接以目录陈列：
+
+[本文](https://zhuanlan.zhihu.com/p/166413604)
+
+[MIT 6.828：实现操作系统 | Lab1：看看内核](https://zhuanlan.zhihu.com/p/168787600)
+
+[MIT 6.828：实现操作系统 | Lab 2 Part 1：内核内存分配器](https://zhuanlan.zhihu.com/p/176967610)
+
+[MIT 6.828：实现操作系统 | Lab 2 Part 2：内核内存映射](https://zhuanlan.zhihu.com/p/183974374)
+
+[MIT 6.828：实现操作系统 | Lab 3A：虚拟地址映射实现总结](https://zhuanlan.zhihu.com/p/192886969)
+
+[MIT 6.828：实现操作系统 | Lab 3A：为进程加载ELF文件](https://zhuanlan.zhihu.com/p/194501828)
+
+[MIT 6.828：实现操作系统 | Lab 3A：中断初始化](https://zhuanlan.zhihu.com/p/213873367)
+
+[MIT 6.828：实现操作系统 | Lab 3B：中断处理函数和系统调用](https://zhuanlan.zhihu.com/p/228812106)
+
+[MIT 6.828：实现操作系统 | Lab 4A：多处理器、内核锁、简单进程调度](https://zhuanlan.zhihu.com/p/228485847)
+
 【更新 2020.9.9】
 
 我开**新坑**了：[CS143：编译原理 | 环境搭建HelloWorld](https://zhuanlan.zhihu.com/p/226190284)
