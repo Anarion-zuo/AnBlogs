@@ -20,7 +20,7 @@
 
 # 指定处理函数
 
-这个标题对应`Exercise 8`。
+这个标题对应`Exercise 8`和``11`。
 
 用户进程通过函数`set_pgfault_handler`给自己设置`Page Fault`的处理函数，这个进程触发`Page Fault`之后，会由指定的函数处理。我们需要完善`set_pgfault_handler`。
 
@@ -30,7 +30,7 @@
 
 在`pfentry.S`的开头，这个流程马上跳转到了函数`_pgfault_handler`。这是个全局函数指针，不像`env_pgfault_upcall`总是接受一个固定的值，`_pgfault_handler`函数指针在函数`set_pgfault_handler`中设置为指定的值。这样一来，虽然`env_pgfault_upcall`的值总是固定，我们还是可以为进程定义不同的`Page Fault`处理函数。
 
-有了这个理解，写代码就很容易了。全局函数指针`_pgfault_handler`没有设置初始值，则初始值是`NULL`，这让我们可以对第一次调用进行特殊处理。第一次调用`set_pgfault_handler`，要为中断时使用的栈分配空间。第一次调用之后，`_pgfault_handler`应设置为传入的函数指针，使得配置生效，并将当前进程的结构体通过系统调用`sys_env_set_ogfault_upcall`进行设置。具体代码如下：
+有了这个理解，写代码就很容易了。全局函数指针`_pgfault_handler`没有设置初始值，则初始值是`NULL`，这让我们可以对第一次调用进行特殊处理。第一次调用`set_pgfault_handler`，要为中断时使用的栈分配空间。第一次调用之后，`_pgfault_handler`应设置为传入的函数指针，使得配置生效，并将当前进程的结构体通过系统调用`sys_env_set_pgfault_upcall`进行设置。具体代码如下：
 
 ```c
 void
@@ -53,5 +53,35 @@ set_pgfault_handler(void (*handler)(struct UTrapframe *utf))
 }
 ```
 
+系统调用`sys_env_set_pgfault_upcall`实现也很简单，通过`envid`将当前进程的`Env`结构体查出来，给相应`env_pgfault_upcall`属性赋值就可以。
+
+```c
+static int
+sys_env_set_pgfault_upcall(envid_t envid, void *func)
+{
+	int ret;
+
+	struct Env *env;
+	ret = envid2env(envid, &env, 1);
+	if (ret < 0) {
+	    return ret;
+	}
+	// set func
+	env->env_pgfault_upcall = func;
+	return 0;
+}
+```
+
 # 为处理函数传参
 
+本标题对应`Exercise 9`，主要代码写在文件`kern/trap.c`中的函数`page_fault_handler`。
+
+处理函数接受`UTrapframe`结构体指针作为参数，正如指针`_pgfault_handler`定义的那样。和之前的中断传参一样，我们在栈中构造这个结构体，并将`esp`压栈，就可以正确传参。将`esp`压栈的操作在`pfentry.S`的`call`指令发生之前，准备栈的操作在内核中进行，内核准备好栈之后再跳转到`pfentry.S`。
+
+## 构造栈
+
+在开始构造结构体之前，先准备一个栈，提供给中断处理函数使用。中断栈在函数`set_pgfault_handler`第一次调用时准备好，我们在上文已经完成了相关代码。
+
+还需要注意的是，在`Page Fault`处理函数中发生`Page Fault`中断，应和其它情况进行不同处理，因为此时的栈已经是中断栈，不是。
+
+## 构造`UTrapframe`结构体
