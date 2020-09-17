@@ -11,15 +11,25 @@ So you have been warned.
 
 本坑在这个专栏：[CS143 编译原理](https://zhuanlan.zhihu.com/c_1286787362224693248)。知乎以后可能把专栏弄没了，故今后本坑中所有文章都有链接指向本文。
 
-CS143是斯坦福的编译原理导论课，常听说这个课的`Assignment`很难，值得一做。各个`Assignment`实现了一个`cool`语言编译器。`cool`语言不是真正使用在生产环境中的，只是一个教学用具，语法和`opencl`有点像，你可以使用`opencl`的语法高亮来阅读代码。做完之后，能够加深对编译原理的各个方面的理解。
+CS143是斯坦福的编译原理导论课，常听说这个课的`Assignment`很难，值得一做。各个`Assignment`实现了一个`cool`语言编译器，做完之后，能够加深对编译原理的各个方面的理解。`cool`语言不是真正使用在生产环境中的，只是一个教学用具，语法和`opencl`有点像，你可以使用`opencl`的语法高亮来阅读代码。`VSCode`有为`Cool`语言提供语法高亮的插件。
 
 本文只进行**环境搭建和材料准备**，具体实现在之后的文章中发出。
 
 本文md文档源码链接：[AnBlogs](https://github.com/Anarion-zuo/AnBlogs/blob/master/cs143/pa0-setup.md)
 
+# 专栏目录
+
+我将本系列文章链接按顺序整理在这里，发布新文章后目录自然生长。
+
+[本文](https://zhuanlan.zhihu.com/p/226190284)
+
+[CS143：编译原理｜PA1：熟悉Cool语言](https://zhuanlan.zhihu.com/p/250667235)
+
 # 官网材料下载
 
-你可能需要两种材料，课程视频和课件作业。前者在B站可以找到，后者的大部分在[课程网站](http://web.stanford.edu/class/cs143/)。然而，斯坦福把这个课从`Cousera`和自家的MOOC上撤掉了，我花了些时间才找到编程作业，在[edx.org](https://courses.edx.org/courses/course-v1:StanfordOnline+SOE.YCSCS1+2T2020/course/)，不知道将来会不会把这个也撤了。如果`edx`上面的资料也撤了，可以从[我的GitHub仓库](https://github.com/Anarion-zuo/Stanford-CS143)的`skeleton`分支下载，原封不动放着从`edx`上下载解压的内容。这个仓库的`master`分支下放的是我的实现，不定期随缘写写，每次写完一个`PA`就发一篇文章。
+你可能需要两种材料，课程视频和课件作业。前者在B站可以找到，后者的大部分在[课程网站](http://web.stanford.edu/class/cs143/)。然而，斯坦福把这个课从`Cousera`和自家的MOOC上撤掉了，我花了些时间才找到编程作业，在[edx.org](https://courses.edx.org/courses/course-v1:StanfordOnline+SOE.YCSCS1+2T2020/course/)，不知道将来会不会把这个也撤了。
+
+如果`edx`上面的资料也撤了，可以从[我的GitHub仓库](https://github.com/Anarion-zuo/Stanford-CS143)的`skeleton`分支下载，原封不动放着从`edx`上下载解压的内容。这个仓库的`master`分支下放的是我的实现代码，你可以去这个仓库找我的实现代码，我的每篇文章也都会完整贴上对应的实现代码。
 
 如果你真的找不到一些素材，可以在评论区提醒我。
 
