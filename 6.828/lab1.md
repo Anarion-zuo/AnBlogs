@@ -42,6 +42,8 @@
 
 [MIT 6.828：实现操作系统 | Lab 4A：多处理器、内核锁、简单进程调度](https://zhuanlan.zhihu.com/p/228485847)
 
+我写的代码保存在自己的这个仓库，同时也在各文章中完整贴出：[MIT-6.828](https://github.com/Anarion-zuo/MIT-6.828)
+
 【更新 2020.9.9】
 
 我开**新坑**了：[CS143：编译原理 | 环境搭建HelloWorld](https://zhuanlan.zhihu.com/p/226190284)
