@@ -19,15 +19,17 @@ CS143是斯坦福的编译原理导论课，常听说这个课的`Assignment`很
 
 # 官网材料下载
 
-你可能需要两种材料，课程视频和课件作业。前者在B站可以找到，后者的大部分在[课程网站](http://web.stanford.edu/class/cs143/)。然而，斯坦福把这个课从`Cousera`和自家的MOOC上撤掉了，我花了些时间才找到编程作业，在[edx.org](https://courses.edx.org/courses/course-v1:StanfordOnline+SOE.YCSCS1+2T2020/course/)，不知道将来会不会把这个也撤了。如果你真的找不到一些素材，可以在评论区提醒我。
+你可能需要两种材料，课程视频和课件作业。前者在B站可以找到，后者的大部分在[课程网站](http://web.stanford.edu/class/cs143/)。然而，斯坦福把这个课从`Cousera`和自家的MOOC上撤掉了，我花了些时间才找到编程作业，在[edx.org](https://courses.edx.org/courses/course-v1:StanfordOnline+SOE.YCSCS1+2T2020/course/)，不知道将来会不会把这个也撤了。如果`edx`上面的资料也撤了，可以从[我的GitHub仓库](https://github.com/Anarion-zuo/Stanford-CS143)的`skeleton`分支下载，原封不动放着从`edx`上下载解压的内容。这个仓库的`master`分支下放的是我的实现，不定期随缘写写，每次写完一个`PA`就发一篇文章。
 
-你可以在以上两个链接里面到处看看。
+如果你真的找不到一些素材，可以在评论区提醒我。
+
+你可以在以上的链接里面到处看看。
 
 ![Table of Content](pa0-setup.assets/image-20200908213805651.png)
 
 我的博客记录我实现各个`Programming Assignment`的历程，当然要引用编译原理的知识，但是不会系统讲解，也不会看`Written Assignment`。如果你还没有系统学习过编译原理，可以参考课程视频进行学习，或配合着一些教科书。
 
-每个`Assignment`有对应的说明`handout`和一些已经写好了的代码，这些都可以在以上两个链接中找到。
+每个`Assignment`有对应的说明`handout`和一些已经写好了的代码`skeleton`，这些都可以在以上两个链接中找到。
 
 # 环境搭建
 
@@ -75,3 +77,13 @@ test:	compile
 能够正确输出，就是配置基本完成了。
 
 之后可能有所调整，不过大概就是这样。
+
+# 有哪些资料
+
+我们想要的是`Programming Assignment`有关的文件，对应代码框架在`assignment`目录下，`assignment`目录下以`J`结尾的子目录是Java版本的实现，我的文章都将使用`C/C++`实现。
+
+每次`PA`的PDF说明在`handouts`目录下，要完整完成各个`PA`，还必须看看课程网站上的`Resources`标题下的链接。具体在之后的文章中提及。
+
+# MOOC版本和正式课程不同
+
+你可能发现了，[课程官网](http://web.stanford.edu/class/cs143/)上的`PA1`和我们下载的`assignments PA1`不相符，课程官网上的`PA1`已经开始写编译器了。这是MOOC版本和正式课程的区别。正式课程如课程官网所示，有4个主要编程作业，最后一个是**加分项**`Extra Credit`，第一个作业就开始写编译器。MOOC版本的第一个编程作业是**熟悉Cool语言**，之后的4个编程作业和正式课程相同。我们在这里下载到的是MOOC版本的材料，也就接着使用这个版本的，反正和正式课程没有特别大的区别。
