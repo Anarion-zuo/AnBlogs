@@ -62,7 +62,7 @@
 
 # 材料准备
 
-我选择2018版本的课程材料学习。从2020开始，MIT 6.828有较大变动，原来的一门课被拆成两门，其中要写代码的部分作为研究生实验课单独讲授，本科生导论课写代码成分下降。
+我选择2018版本的课程材料学习。从2020开始，MIT 6.828有关课程有较大变动，原来的一门课被拆成两门，其中原6.828内容被放到新课6.S081，而6.828作为研究生课程，讲授操作系统研究方面等深入内容。本文采用2018原6.828材料，现在应为6.S081材料。
 
 >   **Fall 2020**: 6.828 and 6.S081 will be offered as two separate classes. 6.S081 (Introduction to Operating Systems) will be taught as a stand-alone AUS subject, and will provide an introduction to operating systems. 6.828 will be offered as a graduate-level seminar-style class focused on research in operating systems. 6.828 will assume you have taken 6.S081 or an equivalent class.
 
