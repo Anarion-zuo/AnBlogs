@@ -47,11 +47,23 @@ CS143是斯坦福的编译原理导论课，常听说这个课的`Assignment`很
 
 如果你目前正在使用Windows作为主要开发环境，可以在`VirtualBox`中导入[提供的虚拟机](https://stanford.box.com/s/28bcmqycmsxme77gi1ep1yo9lo27znrz)。这是个古老的发行版，我没有深入研究过，应该近似`Ubuntu 10.04`或`11.10`。运行这个虚拟机，就可以直接获得配置好的环境。你可以通过`VSCode`远程开发插件在虚拟机上写代码。
 
-如果你目前正在使用Linux作为主要开发环境，可以不使用这个虚拟机。我的`VirtualBox`貌似不能兼容最新版本的Linux内核，而我又不小心更新了，也就没有使用虚拟机。以下是Linux下的环境搭建。
+如果你目前正在使用Linux作为主要开发环境，可以不使用这个虚拟机。我的`VirtualBox`貌似不能兼容最新版本的Linux内核，而我又不小心更新了。再加上`VSCode`不支持32位架构远程编辑，我也就没有使用虚拟机。以下是Linux下的环境搭建。
 
 在[edx.org](https://courses.edx.org/courses/course-v1:StanfordOnline+SOE.YCSCS1+2T2020/course/)中，提供了一个压缩包[下载链接](https://courses.edx.org/asset-v1:StanfordOnline+SOE.YCSCS1+1T2020+type@asset+block@student-dist.tar.gz)，`wget`这个链接，解压到目录`/usr/class`下。这是官方配置方式。
 
 从我目前为止的使用来看，我们可以把其它文件留在我们想要的地方，而将`bin`子目录下的内容加入环境变量，就可以正常使用课程需要的一些可执行文件，没必要维持那个目录结构。
+
+【更新 2020.9.18】
+
+之后的`PA`需要使用两个工具`flex, bison`，你可能已经注意到了，它们需要我们额外安装。当然，如果你使用了官方虚拟机，就不用自己安装，也不用担心以下要说的问题。
+
+课程使用的`flex`版本较老，没有考虑到`C++`和`C`轻微不兼容问题。或者说，新版本`flex`默认你的代码是与时俱进的。不论如何，为了使用课程提供的代码，我们不得不使用更老的`flex`版本。写在这里提醒你，是因为你的`Linux`包管理工具默认安装最新版本`2.6+`，而你可能对一些错误迷惑不已。
+
+官方虚拟机使用的是`2.5.35`，所以我们最好也这么做。我从[这里](https://src.fedoraproject.org/lookaside/pkgs/flex/flex-2.5.35.tar.bz2/)下载到的压缩包，解压之后`./configure && make && sudo make install`一套连就可以了。
+
+还不清楚`bison`是否有版本要求，之后发现这方面问题再写上来。
+
+【更新结束】
 
 设置好环境变量后，在命令行输入`coolc`，应该可以看到`cool`编译器的输出，提示`Main`入口类不存在。
 
