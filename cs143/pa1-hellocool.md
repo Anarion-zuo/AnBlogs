@@ -1,7 +1,7 @@
 #! https://zhuanlan.zhihu.com/p/250667235
 # CS143：编译原理｜PA1：熟悉Cool语言
 
-这是本人实现斯坦福`CS143`变编程作业的笔记，对应第一次作业`PA1`。环境搭建和一些说明请看：[CS143：编译原理 | 环境搭建HelloWorld](https://zhuanlan.zhihu.com/p/226190284)
+这是本人实现斯坦福`CS143`编程作业的笔记，对应第一次作业`PA1`。环境搭建和一些说明请看：[CS143：编译原理 | 环境搭建HelloWorld](https://zhuanlan.zhihu.com/p/226190284)
 
 从第一篇搬运一段话。
 
