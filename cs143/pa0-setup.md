@@ -27,6 +27,16 @@ CS143是斯坦福的编译原理导论课，常听说这个课的`Assignment`很
 
 [CS143：编译原理｜PA2：正则表达式和词法分析](https://zhuanlan.zhihu.com/p/258385544)
 
+# 更新放在这个标题下面
+
+【更新 2020.9.29】
+
+我又开新坑了：[MIT 6.824 分布式系统 | 材料准备和环境搭建](https://zhuanlan.zhihu.com/p/260470258)
+
+个人认为，**编译原理**对我的帮助不如**操作系统**和**分布式**大，故暂时搁置`CS143`，先专注学习`6.828`和`6.824`的`Lab`。
+
+**感谢各位捧场**
+
 # 官网材料下载
 
 你可能需要两种材料，课程视频和课件作业。前者在B站可以找到，后者的大部分在[课程网站](http://web.stanford.edu/class/cs143/)。然而，斯坦福把这个课从`Cousera`和自家的MOOC上撤掉了，我花了些时间才找到编程作业，在[edx.org](https://courses.edx.org/courses/course-v1:StanfordOnline+SOE.YCSCS1+2T2020/course/)，不知道将来会不会把这个也撤了。
