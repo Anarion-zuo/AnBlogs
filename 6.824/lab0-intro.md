@@ -30,6 +30,8 @@ So you have been warned.
 
 [MIT 6.824 分布式系统 | Lab 1：MapReduce](https://zhuanlan.zhihu.com/p/260752052)
 
+[MIT 6.824 | Lab 2A：Raft选举](https://zhuanlan.zhihu.com/p/264448558)
+
 # 课程网站
 
 2020课程安排在 https://pdos.csail.mit.edu/6.824/schedule.html，这并不是课程官网的首页`index`，而是`schedule`页。我更喜欢看`schedule`页，因为`index`页并没有课程材料链接。
