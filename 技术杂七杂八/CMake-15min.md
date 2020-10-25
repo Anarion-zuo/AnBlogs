@@ -23,7 +23,7 @@
 
 ## 配置和生成两步
 
-有很多中办法运行`CMake`，无论如何，一定包含两步，配置`configure`和生成`generate`。
+有很多种办法运行`CMake`，无论如何，一定包含两步，配置`configure`和生成`generate`。
 
 ![两步](CMake-15min.assets/cmake-simple-flowchart.png)
 
