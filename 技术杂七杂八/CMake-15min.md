@@ -15,7 +15,7 @@
 
 ## 源文件目录和二进制输出目录
 
-`CMake`定义了**构建流水线**`build pipelines`，其它形式的构建流水线如`Visual Studio`的`.sln`文件、`Xcode`的`.xcodeproj`、`Unix`系统的`Makefile`。
+`CMake`定义了**构建流水线**`build pipelines`，其它形式的构建流水线如`Visual Studio`的`.sln`文件、`Xcode`的`.xcodeproj`、`Unix`系统的`Makefile`。`CMake`定义一个广泛的**构建流水线**，然后转化成这些其中之一
 
 **构建流水线**的建立需要指定**源文件目录**和**输出目录**。对于`CMake`，原文件目录是**包含**`CMakeLists.txt`的目录，输出目录是**建立**构建流水线时的**工作目录**。常用的结构时，在原文件目录下创建一个`build`子目录，以`build`目录为工作目录创建**构建流水线**。把**输出目录**和**源文件目录**分开，可以随时删掉**输出目录**，甚至可以同时使用多个**构建流水线**，放在多个不同的`build`目录下。
 
@@ -27,11 +27,11 @@
 
 ![两步](CMake-15min.assets/cmake-simple-flowchart.png)
 
-**生成**`configure`步就是运行`CMakeLists.txt`，定义了一些目标`target`。执行过程中做了哪些事情，由`CMakeLists.txt`内容决定。
+**配置**`configure`步就是运行`CMakeLists.txt`，定义了一些目标`target`。执行过程中做了哪些事情，由`CMakeLists.txt`内容决定。
 
 ## 从命令行运行CMake
 
-选好`CMakeLists.txt`文件所在目录和`cmake`指令的工作目录，决定了源文件目录和二进制输出目录。通常在源文件目录下创建子目录`build`，在`build`目录下执行`cmake`。
+选好`CMakeLists.txt`文件所在目录和`cmake`指令的工作目录，也就决定了源文件目录和二进制输出目录。通常在源文件目录下创建子目录`build`，在`build`目录下执行`cmake`。
 
 ```bash
 mkdir build
@@ -55,7 +55,7 @@ cmake -G "Visual Studio 15 2017" -DDEMO_ENABLE_MULTISAMPLE=1 ..
 
 以上创建了变量`DEMO_ENABLE_MULTISAMPLE`，值为`1`。注意，`-D`后没有空格。
 
-写`C/C++`项目时，你可能想要指定`CMAKE_BUILD_TYPE=Debug/Release`。`CMake`默认选项为未优化、无符号，即没有效率提升，也不能用于`debug`，没啥用。`CMAKE_BUILD_TYPE`最好一定手动指定。
+写`C/C++`项目时，你可能想要指定`-DCMAKE_BUILD_TYPE=Debug/Release`。`CMake`默认选项为未优化、无符号，即没有效率提升，也不能用于`debug`，没啥用。`CMAKE_BUILD_TYPE`最好手动指定。
 
 产生了一个`build pipeline`之后，就和`CMake`没什么关系了。如以`make`为目标，在`CMakeLists.txt`中定义的所有`target`都可以通过`make`构建。
 
