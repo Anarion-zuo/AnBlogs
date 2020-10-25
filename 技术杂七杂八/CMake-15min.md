@@ -5,7 +5,7 @@
 
 前一篇讲解`CMake`的工作流程，以及如何在命令行中使用`cmake`。后一篇讲解`cmake`脚步语法。这是我找到的为数不多系统讲解`CMake`工具的材料，非常可贵，值得写本文，值得好好阅读理解。
 
-本文md文档链接：
+本文md文档链接：[AnBlogs](https://github.com/Anarion-zuo/AnBlogs/blob/master/%E6%8A%80%E6%9C%AF%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB/CMake-15min.md)
 
 下面正式开始。
 
