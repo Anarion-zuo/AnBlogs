@@ -5,6 +5,8 @@
 
 前一篇讲解`CMake`的工作流程，以及如何在命令行中使用`cmake`。后一篇讲解`cmake`脚步语法。这是我找到的为数不多系统讲解`CMake`工具的材料，非常可贵，值得写本文，值得好好阅读理解。
 
+本文第一次发布的时候，还很不完善。我写了一部分马上被女朋友喊去吃烧烤，回来之后相当于是从中间乱入重新开始阅读，还急着要做其它事情，很多工作都是`overhaste`。令我很吃惊的是，本文流量巨大，远大于我的一些其它文章。这些其它文章在我看来，提供的信息远多于本文，即便是现在已经修饰之后的本文。你现在看到的是修饰之后的版本，增加了一些例子，展开讲解了一些不清晰的地方，统一了一些术语。希望能给你更多帮助。
+
 本文md文档链接：[AnBlogs](https://github.com/Anarion-zuo/AnBlogs/blob/master/%E6%8A%80%E6%9C%AF%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB/CMake-15min.md)
 
 下面正式开始。
@@ -15,9 +17,13 @@
 
 ## 源文件目录和二进制输出目录
 
-`CMake`定义了**构建流水线**`build pipelines`，其它形式的构建流水线如`Visual Studio`的`.sln`文件、`Xcode`的`.xcodeproj`、`Unix`系统的`Makefile`。`CMake`定义一个广泛的**构建流水线**，然后转化成这些其中之一
+`CMake`定义了**构建流水线**`build pipelines`，其它形式的构建流水线如`Visual Studio`的`.sln`文件、`Xcode`的`.xcodeproj`、`Unix`系统的`Makefile`。`CMake`定义一个广泛的**构建流水线**，然后转化成这些其中之一。
 
-**构建流水线**的建立需要指定**源文件目录**和**输出目录**。对于`CMake`，原文件目录是**包含**`CMakeLists.txt`的目录，输出目录是**建立**构建流水线时的**工作目录**。常用的结构时，在原文件目录下创建一个`build`子目录，以`build`目录为工作目录创建**构建流水线**。把**输出目录**和**源文件目录**分开，可以随时删掉**输出目录**，甚至可以同时使用多个**构建流水线**，放在多个不同的`build`目录下。
+`CMake`的`C`不是`C/C++`，而是跨平台`Cross Platform`，虽然`CMake`经常用来构建`C/C++`项目。这里的**跨平台**体现在可以兼容不同工具使用的**构建流水线**。
+
+**构建流水线**的建立需要指定**源文件目录**`Source Folder`和**输出目录**`Binary Folder`。对于`CMake`，原文件目录是**包含**`CMakeLists.txt`的目录，输出目录是**建立**构建流水线时的**工作目录**。其它形式的**构建流水线**可能有其它规定，如`make`其实没有完全区分，更多取决于程序员的设定。
+
+常用的结构是，在项目根目录下创建一个`build`子目录，以`build`目录为工作目录创建**构建流水线**。把**输出目录**`Binary Folder`和**源文件目录**`Source Folder`分开，可以随时删掉**输出目录**`Binary`，甚至可以同时使用多个**构建流水线**，放在多个不同形式的`build`目录下。
 
 我们通常不把**输出目录**下的文件提交给`VCS`。
 
@@ -27,9 +33,11 @@
 
 ![两步](CMake-15min.assets/cmake-simple-flowchart.png)
 
-**配置**`configure`步就是运行`CMakeLists.txt`，定义了一些目标`target`。执行过程中做了哪些事情，由`CMakeLists.txt`内容决定。
+**配置**`configure`步就是运行`CMakeLists.txt`，定义了一些目标`target`。执行过程中做了哪些事情，由`CMakeLists.txt`内容决定。**生成**步是利用**配置**步的执行结果，产生一个具体的**构建流水线**，如`make`或`VS sln`。具体产生哪个，在脚本中指定。
 
-## 从命令行运行CMake
+**配置**步会产生一个缓存文件`CMakeCache.txt`，用来加速重复工作，我们可以暂时不关心它。
+
+## 从命令行运行CMake Configure
 
 选好`CMakeLists.txt`文件所在目录和`cmake`指令的工作目录，也就决定了源文件目录和二进制输出目录。通常在源文件目录下创建子目录`build`，在`build`目录下执行`cmake`。
 
@@ -37,7 +45,10 @@
 mkdir build
 cd build
 cmake ..
+# make SomeTarget
 ```
+
+这样一来，项目根目录就是**源文件目录**，`build`目录就是**输出目录**。编译结果会出现在`build`目录下。
 
 给`-G`值，指定想要输出哪种`build pipeline`。
 
@@ -53,11 +64,16 @@ cmake -G "Visual Studio 15 2017" ..
 cmake -G "Visual Studio 15 2017" -DDEMO_ENABLE_MULTISAMPLE=1 ..
 ```
 
-以上创建了变量`DEMO_ENABLE_MULTISAMPLE`，值为`1`。注意，`-D`后没有空格。
+以上创建了变量`DEMO_ENABLE_MULTISAMPLE`，值为`1`。注意，`-D`后没有空格。这个变量在脚本内部可以访问，具体如何操作请看本翻译后半部分。
 
-写`C/C++`项目时，你可能想要指定`-DCMAKE_BUILD_TYPE=Debug/Release`。`CMake`默认选项为未优化、无符号，即没有效率提升，也不能用于`debug`，没啥用。`CMAKE_BUILD_TYPE`最好手动指定。
+写`C/C++`项目时，你可能想要指定`-DCMAKE_BUILD_TYPE=Debug/Release`。`CMake`默认选项为未优化、无符号，即没有显著效率提升，也不能用于`debug`，价值不大。`CMAKE_BUILD_TYPE`最好手动指定。
 
-产生了一个`build pipeline`之后，就和`CMake`没什么关系了。如以`make`为目标，在`CMakeLists.txt`中定义的所有`target`都可以通过`make`构建。
+产生了一个`build pipeline`之后，就和`CMake`没什么关系了。如设定`CMake`脚本产生了`make`，在`CMakeLists.txt`中定义的所有`target`都可以通过`make`构建。
+
+```bash
+cmake ..  # has target HelloCpp
+make HelloCpp
+```
 
 构建其它类型的`build pipeline`，请参考[原文](https://preshing.com/20170511/how-to-build-a-cmake-based-project/)。
 
@@ -323,7 +339,7 @@ message("${RESULT}")     # Prints: 8
 
 ## 读写属性
 
-`CMake`项目有一些**目标**`target`，这些`target`在`CMake`项目被编译之后，可以通过`make`构建。指令`add_executable, add_library, add_custom_target`可以创建`target`，创建之后，`target`就具有了一些**属性**`properties`。通过`get_property, set_property`指令可以修改这些属性。
+`CMake`项目有一些**目标**`target`，这些`target`在`CMake`项目被编译之后，可以通过`make`构建。指令`add_executable, add_library, add_custom_target`可以创建`target`，创建之后，`target`就具有了一些**属性**`properties`。通过`get_property, set_property`指令可以修改这些属性，这些属性和具体使用的编译器`gcc/clang/…`有关，可以理解为，写给编译器的一些`flag`，如指定优化等级`-O1 -O2`。
 
 ```cmake
 add_executable(MyApp "main.cpp")        # Create a target named MyApp
@@ -332,6 +348,13 @@ add_executable(MyApp "main.cpp")        # Create a target named MyApp
 get_property(MYAPP_SOURCES TARGET MyApp PROPERTY SOURCES)
 
 message("${MYAPP_SOURCES}")             # Prints: main.cpp
+```
+
+上面的脚本执行之后，生成一个`Makefile`，通过这个`Makefile`可以构建`MyApp`。
+
+```bash
+cmake ..
+make MyApp
 ```
 
 `get_property`中，指定了`target`为`MyApp`，`property`名为`SOURCES`，最终结果存储在`MYAPP_SOURCES`。
