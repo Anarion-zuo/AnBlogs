@@ -1,5 +1,3 @@
-#! https://zhuanlan.zhihu.com/p/453859487
-
 # CSAPP Malloc Lab的一种实现
 
 Malloc Lab是CSAPP和相关课程很早就有的一个Lab，帮助学生理解内存分配器的算法和实现。如果你对`malloc`和它的变体，及内存管理本身有兴趣，那么这个Lab非常适合你。
@@ -190,7 +188,7 @@ if (!*listnode) {
 
 小块队列拿到一个大块后，把大块进行初始化，也就是拉上隐式链表。如果你对这个操作不熟悉，请看CSAPP书9.9节。下图展示了这个过程，帮助你回忆。
 
-![](/home/anarion/AnBlogs/csapp/assets/2022-01-06-00-42-56-image.png)
+![](./assets/4311066a32a02a16480dd5106169d462be987bb3.png)
 
 要注意最后一块的`next`指针给成空。
 
