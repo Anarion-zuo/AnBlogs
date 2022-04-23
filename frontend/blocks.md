@@ -1,10 +1,12 @@
 # CSS盒模型box
 
 两种类型：
+
 - block
 - inline
 
 两种显示方式display：
+
 - outer
 - inner
 
@@ -12,13 +14,17 @@
 
 ## 外部显示outer display
 
+总的来说，分为block和inline两种显示方式。block在垂直方向相互依次排列，且每个元素都会占满整个行。inline的元素像单个字符一样，水平方向依次排列。inline-block处在两者之间，可以理解为令block变成字符。
+
 为block时：
+
 - 新开启一行显示block
 - 行方向上，盒子尽量充满父级容器，通常会充满整个容器
 - 设置属性width/height是有用的
 - 盒子边界属性影响盒子的位置padding/margin/border
 
 为inline时：
+
 - 不新开启一行显示盒子
 - width/height设置无效
 - 垂直方向上的边界属性无效padding/margin/border
@@ -81,11 +87,13 @@
 ## 尺寸
 
 标准模型：
+
 - width/height指定内容宽高
 - 盒子真正的宽高=width/height+padding+border
 - margin不认为时盒子宽高的一部分
 
 alternative：
+
 - ...
 
 ## 边框
@@ -115,3 +123,9 @@ inline-block是两者的中间状态。
 可以设置overflow-x/overflow-y，令滚动条出现在不同位置。
 
 设置为auto，控制滚动条在不需要出现的时候隐藏。
+
+## flex
+
+
+
+## grid
