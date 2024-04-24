@@ -14,7 +14,7 @@ Can have 2 different objectives. Only care about the discounted value function, 
 $$
 V^\pi(s)=E[\sum_{t=0}^{\infty} \gamma^t r(s_t, a_t)|s_0=s, \pi]
 $$
-is the expected value of some trajectory starting from state $s$, given policy $\pi$. There exists an optimal $\pi$ s.t. $V^*=\argmin_\pi V^{\pi}$.
+is the expected value of some trajectory starting from state $s$, given policy $\pi$. There exists an optimal $\pi$ s.t. $V^*=\argmax_\pi V^{\pi}$.
 
 ## Markov Decision Process (MDP)
 
@@ -50,7 +50,6 @@ p(s_t|s_0)=\sum_{(s_k,a_k)_{k=1}^{t-1}} p(s_t,(s_k,a_k)_{k=1}^{t-1}|s_0)=\sum_{(
 $$
 to compute which we need the defined policy and transition probability kernel.
 
-
 ## The Process in general
 
 Set up the problem with what we know. Decide on an exploring policy. Think lightly on the possible differences between exploring and target policy. Let the actor start exploring and collect trajectories. Compute a Bellman target $V(s)$ given the collected trajectories and/or estimate $\nabla_\theta V(s)$. Verify the biasness of the estimates. Collect more trajectories and so on.
@@ -62,12 +61,13 @@ Set up the problem with what we know. Decide on an exploring policy. Think light
 - Model-based/free: Whether the learning process extracts state transition information $p(s'|s,a)$ or $p(s'|s)$ from the environment directly, or through a (deep) model modeling the environment.
 - Offline/Online: Offline training is when you use data collected from pre-computed simulations or pre-run interactions. The data can be stored and reused. Online training is when you collect data from an actually running actor.
 - Exploration/Exploitation: Exploitation means keep doing the action that improves the objective the most. Exploration means try to do actions other than the currently improving ones, so that some other improving actions may show up in the future.
+- Rollout: Start exploring from a given state. We get a trajectory after a rollout, a sequence of states, actions, and reward values.
 
 ## Bellman Operators
 
 Given any function $V:S\rightarrow \R$, some policy $\pi$, where $S$ is the state set. Define the *Value Function of the policy* as:
 $$
-V^\pi=E[\sum_{t=0}^{\infty} \gamma^t r(s_t, a_t)|s_0=s, \pi]
+V^\pi(s)=E[\sum_{t=0}^{\infty} \gamma^t r(s_t, a_t)|s_0=s, \pi]
 $$
 
 Define the policy's *Bellman Operator* for any function $V$ as:
@@ -83,7 +83,7 @@ $$
 
 Define the *Optimal* Bellman Operator as:
 $$
-T^* V(s) = \max_{a\in A} \left\{ r(s, a) + \gamma\sum_{s'}p(s'|s,a)V(s') \right\}
+T^* V(s) = \max_{a\in A} \left\{ r(s, a) + \gamma\sum_{s'}p(s'|s,a)V(s') \right\} = \max_{a\in A} \left\{ r(s, a) + \gamma E_{s'\sim p(\cdot|s,a)} V(s') \right\}
 $$
 is a special case of the *policy's* Bellman Operator, with $p(a|s)=\delta(a-a^*_s)$, where $a^*_s=\argmax_a p(a|s)$, abusing the letter $a$.
 
@@ -116,7 +116,7 @@ V^{\pi_k}\le T^* V^{\pi_k}\le T^{\pi_{k+1}}V^{\pi_k}\le (T^{\pi_{k+1}})^n V^{\pi
 $$
 This is true once the monotonocity property of the Bellman Operator is proved. This is trivial:
 $$
-T^\pi W_1 - T^\pi W_2 = \gamma E_{s'\sim (\cdot|s, a)}[W_1(s') - W_2(s')]
+T^\pi W_1 - T^\pi W_2 = \gamma E_{s'\sim (\cdot|s, a)}\left[W_1(s') - W_2(s')\right]
 $$
 which preserves the sign from $W_1-W_2$. So $W_1\le W_2 \Rightarrow T^\pi W_1\le T^\pi W_2$.
 
@@ -138,6 +138,10 @@ $$
 $$
 which still is an unbiased approximation of $V^\pi$.
 
+The truncated sum has a recursive form. Denote $R_t^\pi V^\pi(s_t)=r_{t,i}+\gamma V^\pi (s_{t+1})$. The truncated sum can be written as $\hat{R}_i(s_0)=R^\pi_0R^\pi_1...R_{T-1}^\pi V^\pi(s_0)$, applying the operator $T$ times.
+
+During the RL training process, when the $V^\pi$ is not yet optimal, i.e. we only have a biased $\hat V^\pi$, this estimate is in turn biased.
+
 Monte Carlo computes the empirical mean in a sequential manner.
 $$
 \hat{V}_n^\pi(s)=\frac{1}{n}\sum_{i=1}^n \hat{R}_i(s)=\frac{n-1}{n}\hat{V}_{n-1}^\pi(s)+\frac{1}{n}\hat{R}_n(s)
@@ -153,7 +157,7 @@ Consider only trajectories with one state transition, i.e. $(s_t,a_t,s_{t+1})$, 
 $$
 \hat{R}(s)=r_t
 $$
-and cat use the *truncated* form since we want $\hat{V}^\pi$ to be the unbiased approximation to $V^\pi$.
+and cat use the one-step *truncated* form since we want $\hat{V}^\pi$ to be the unbiased approximation to $V^\pi$.
 $$
 \hat{V}^\pi(s_t)=(1-\eta)\hat{V}^\pi(s_t) + \eta(r_t+\gamma\hat{V}^\pi(s_{t+1}))=\hat{V}^\pi(s_t) + \eta(r_t + \gamma\hat{V}^\pi(s_{t+1})-\hat{V}^\pi(s_t))
 $$
@@ -223,7 +227,72 @@ In the end, the model converges to the state value function of the $\epsilon$-gr
 
 Note the replay buffer's role in trajectory sampling. As the actor explores according to the $\epsilon$-greedy policy, the data distribution of the replay buffer sampling gradually shifts to the exploring distribution, i.e. the trajector distribution of the $\epsilon$-greedy policy.
 
-### DQN Family
+### From $V$ to $Q$
+
+The *state value function* and the *action-state value function* are equivalent, and can be used interchangably with some small fix. Suppose $V^\pi$ is the state value function of policy $\pi$, and $Q^\pi$ also is fit for $\pi$, i.e. they are the fixed point of the Bellman operator $T^\pi$.
+
+The state value function is the expected return considering all actions taken at some given state.
+$$
+V^\pi(s)=E_{a\sim \pi(\cdot|s)} Q^\pi (s,a)
+$$
+
+The action state value function is the expected return when taking a specific action at the state, considering all future possible states and actions.
+$$
+Q^\pi(s,a)=r(s,a)+\gamma E_{s'\sim p(\cdot|s,a)} V^\pi(s')
+$$
+
+This definition fits into the fixed point property of the Bellman operator. So we have a Bellman operator for $Q$, and it has a fixed point, equivalent with the Bellman operator for $V$. One step further for the Bellman operator for $Q^\pi$:
+$$
+Q^\pi(s,a)=r(s,a)+\gamma E_{s'\sim p(\cdot|s,a)}E_{a\sim\pi(\cdot|s)}Q^\pi(s,a)
+$$
+
+Plugin the condition for the optimal Bellman operator, i.e. $\pi(a|s)=\delta(a-a^*)$. We have the equations for the optimal policy.
+$$
+V^*(s) = \max_a Q^*(s,a), Q^*(s,a) = r(s,a) + \gamma E_{s'\sim p(\cdot|s,a)} V^*(s)
+$$
+
+One step further for the optimal policy to get the optimal Bellman operator for $Q$.
+$$
+Q^*(s,a) = r(s,a) + \gamma E_{s'\sim p(\cdot|s,a)} \max_a Q^*(s,a)
+$$
+
+### Return \& Multi-step Return
+
+On observing a new transition, the updated Q value should be:
+
+$$
+Q_{k+1}=TQ_k=r_{t+1} + \gamma\max_{a'} Q_k(s_{t+1}, a')
+$$
+
+This is a biased TD(0) estimate. The $\argmax_a$ process of $Q$ introduces the bias, which we do not have for estimating $V$. To estimate $\max_a Q(s',a)$ for any $s$, we plugin $a^*=\argmax_a Q(s',a)$ to compute an estimate. This choice of $a$ introduces a bias. See more in *Double DQN*.
+
+By steering the model's prediction towards this value, we perform one step in an approximated Value Iteration process.
+
+We can also work with a truncated TD(1) estimate, on observing a trajectory with length larger than 1.
+
+$$
+Q_{k+1}=T^nQ_k=r_{t+1}+\gamma r_{t+2}+...+\gamma^{n-1}r_{t+n}+\gamma^n \max_{a'} Q_k(s_{t+n}, a')
+$$
+where the $Q$ is often computed in the Double DQN fashion. This is a unbiased estimate of $Q$ if the $Q$ in the formular is unbiased. If it is computed in the Double DQN fashion, it is an underestimate. Otherwise it is an overestimate.
+
+We are talking about *estimate*s in the preceding discussion, in the sense that $r_i$'s are estimates of $r(s_i,a_i)$ and $Q_k$'s are estimates of the $Q$'s value in the $k$th term of a *generalized policy iteration* process. The $r_i$'s are observations in experiments, making it an unbiased estimate by definition. The $Q_k$'s are *almost* unbiased at best, due to the approximation ingredient of the process. Following this line of thoughts, the $T$ operator in this case is only for *computation*, since it is w/o an expectation operator and takes estimate values as input. We would hope that the output of this computation described by the formula would yield *almost* unbiased estimate values.
+
+### Double DQN
+
+This is SOP for computing TD estimate in DQN ever since it is published.
+
+We first consider Double Q learning's theory.
+
+Consider $\hat Q(s',a)$ as a series of estimators for each different $a$ to a set of random variables. Denote the estimators as $\hat Q_i=\hat Q(s',a_i)$. Denote the real expected value of $Q$ as $Q_i=E[Q(s',a_i)]$. We want a good estimate of $\max_i Q_i$. An intuitive choice is $\max_i \hat Q_i$, but this is an overestimation. We want an underestimation for this. It is not clear why an underestimation is better in some cases.
+
+Consider 2 sets of independent estimators, predicting the same things. Denote this as $\hat Q_i^A, \hat Q_i^B$. Pick estimators that maximizes $\hat Q^A$, i.e. $a^*=\argmax_i \hat Q^A_i$. These estimators' corresponds to $Q_{a^*}$ for the target values. Consider the estimators in set $B$ predicting the same targets $\hat Q^B_{a^*}$. It is proved that $\hat Q_{a^*}^B\le \max_i Q_i$, which is the ultimate target of this whole thing.
+
+Double DQN trains 2 sets of params for 2 predictors, $\theta,\theta'$. The $a$ in the Bellman target is given by $\theta$, while the $Q$ is computed with params $\theta'$. The 2 sets of params switches role constantly. This implements the idea in Double Q learning, and gets an at-most underestimate result.
+$$
+TQ_{\theta'}=r_{t+1} + \gamma Q_{\theta'}(s_{t+1}, a^*), a^*=\argmax_a Q_{\theta}(s_{t+1},a)
+$$
+
+Why is an underestimate result better is not proved in general.
 
 ## Policy-based Model-free Policy Learning
 
@@ -269,6 +338,56 @@ Pick $b(s)=-V(s)$ to minimize sample variance. Then this $Q$ has the form and pr
 
 ### Conservative Policy Iteration
 
+## Monte-Carlo Tree-based Search
+
+In general, tree search estimates $Q$ or $V$ with Monte-Carlo much like other methods. The process maintains the estimate $Q(s,a)$ and number of visitation $N(s,a)$, and updates the estimate each time a new sample $G$ is observed.
+$$
+Q(s,a) = (1-\frac{1}{N(s,a)})Q(s,a) + \frac{1}{N(s,a)}G
+$$
+
+### UCB
+
+UCB is a simple tree based method. We try to go over the essential parts of MC TB search. The algorithm iteratively constructs a tree, and starts explorations from the leaf nodes. Once an rollout/exploration is done, the nodes' $V$ estimates are updated, representing state updates.
+
+We must first choose a leaf node to start the rollout. We start traversing down the tree from the root node. At each nonterminal node, calculate the UCB score of its child, and go to the child with the largest score. The child can also be chosen stochastically according to the score.
+
+The UCB score:
+$$
+\argmax_a Q(s,a) + 2C_p\sqrt{\frac{2\log N(s)}{N(s,a)}}
+$$
+
+In general, the traversing represents part of the exploration policy, in the multi-armed bandit to be specific.
+
+Now that we are at a leaf node, we try to expand it. Pick an action at random and sample a state from the transition kernel $p(s'|s,a)$. Consider the sampled state as a child of the current leaf node. If the node is never sampled before, we must somehow initialize it in memory. UCB requires that the first time a leaf node is encountered in the traversal, do not expand it yet before the next time it is encountered.
+
+Now that we are truly at a leaf node, we start a simulation/rollout starting from the state it represents. At each step of the simulation, pick an action at random and sample the next state from $p(s'|s,a)$. We get an estimation of the value function of the leaf node's state directly. We can update the estimate of the value function with this new value.
+
+We also update the value function estimate of the ancestor nodes of the leaf node. Simply prepend the nodes to the simulation's trajectory and consider more rewards in the prepended trajectory.
+
+## Pretraining
+
+Before the actor really starts exploring, we collected some trajectories and can use them to boost training a little, or can at least make use of them. The pre-existing experience can be from a human expert's demonstration or data collected from previous runs, or from simulation. The idea is to sample from the experiences/demonstrations and perform a pseudo-VI/PI.
+
+### DQN from Demonstration
+
+Before exploring, load the existing trajectories into the replay buffer, then sample with priority. See priority DQN for details. Except for the standard 1-step TD loss, add an $n$-step TD loss, an L2 regularization loss, and a supervised loss. The supervised loss is
+$$
+J_E(Q) = \max_a \left[ Q(s,a) + l(a_E,a) \right] - Q(s, a_E)
+$$
+where $\cdot_E$ means the $\cdot$ is the value for the (expert's) demonstration. This loss push the params towards $\max_a \left[ Q(s,a) + l(a_E,a) \right] = Q(s, a_E)$, i.e. $\forall a, Q(s,a_E)-Q(s,a)=l(a_E,a)$. There is always a positive margin between any action and the current action from demonstration in the $Q$ value. Suppose we are sampling exploration trajectories according to this $Q$, the actions from demonstration always have a larger probability. This loss makes the pretraining phase look like a part of normal training, sampling trajectories in the pseudo-$\epsilon$-greedy fashion.
+
+After the pretraining phase, demonstration data is not discarded entirely. They co-exists with trajectories from real exploration in the replay buffer. Demonstration data and exploration data holds different priorities, according to the proportional prioritized sampling, with a different constant added to their priority values.
+
+In general, the loss for a given trajectory is
+$$
+J(Q) = J_{DQ}(Q) + \lambda_1 J_n(Q) + \lambda_2 J_E(Q) + \lambda_3 J_{L_2}(Q)
+$$
+where:
+
+- $J_{DQ}$ is the classical DQN loss.
+- $J_n$ is the n-step TD loss.
+- $J_E$ is the loss from demonstration data, or supervised loss. $\lambda_2$ is 0 for real exploration data.
+- $J_{L_2}$ is the regularization loss.
 
 ## Off-policy Exploration
 
@@ -278,23 +397,104 @@ Evaluating a policy often involes an on-policy process, i.e. to follow the curre
 
 Denote the exploring and target policy respectively as $\mu, \pi$. The correction we must introduce into the TD(1) state value function estimate as we sample from $\mu\ne\pi$ is
 $$
-V^\pi(s_t)=V(s_t) + \sum_{k=0}^{K-1}\gamma^k E_{\{a_t\}\sim \mu(\cdot|\{s_t\})}\left\{ \delta(s_{t+k}, a_{t+k}) \prod_{i=0}^k \frac{\pi(a_{t+i}|s_{t+i})}{\mu(a_{t+i}|s_{t+i})} \right\}
+RQ(x,a)=Q(x,a)+E_\mu\left[ \gamma_t \left( \prod_{s=1}^t c_s \right) (r_t + \gamma E_\pi Q(x_{t+1},\cdot) - Q(x_t,a_t)) \right]
 $$
-where $\delta(s_i,a_i)$ is the temporal difference in the TD series of policy evaluation schemes. A simple divide and multiply trick in the expectated value computation does the job. This is the naive *Importance Sampling*, and is an unbiased approximation to the on-policy TD(1) policy evaluation scheme.
+where the IS weight is $c_s=\frac{\pi(a_s|x_s)}{\mu(a_s|x|s)}$. The formula can be rewritten into the form of taking the expectation over the target policy $\pi$ by expanding $E_\mu[\cdot]$ to be $\sum_{a_t,x_t,x_{t+1}}p(a_t,x_t,x_{t+1}) [\cdot]$, cancelling out the $c_s$ products. The current form enable us to replace the $E_\mu$ with sampled $x_t,a_t,x_{t+1}$ values plugged into it. The computed result would be an unbiased estimate of the Bellman target $RQ(x,a)$ of the target policy, where sample data are collected under the exploration policy $\mu$.
 
-### Retrace \& V-trace \& LASER
+### V-trace
+
+Vtrace is an improvement over Retrace, which we do not talk about here. The training process is splitted into the learner part and the actor part, which runs entirely independently from each other. An actor collects trajectories according to the local model in a greedy fashion, as computed by the local policy model. Once some trajectories are collected, the actor send them to the learner via a shared queue, and recieves params update from the learner in its own pace, without any waiting to sync with the learner. The learner waits for the actors to send their trajectories by polling on the shared queue and makes no attempt to coordinate the actors.
+
+Vtrace implements an async actor-critic training fashion, which introduces a correction from the difference between the learners' newest param version and the not-yet-updated version held by individual actors. The actors may push trajectories into the shared queue several times, before they pull params from the learners. By the time new trajectories are collected and respective values are computed by the actor, the learners' params would have been updated for several runs unknown to the actor. So the actor computes not only the rewards in the trajectories, but also the policy likelihood, to let the learner compute a correction for this param lag. In general, Vtrace is a *close* on-policy learning scheme with clever correction computations.
+
+Bellman target with correction in the general form:
+$$
+v_s=V(x_s) + \sum_{t=s}^{s+n-1} \gamma^{t-s} \left(\prod_{i=s}^{t-1} c_i \right)\delta_t, \delta_t=\rho_t (r_t + \gamma V(x_{t+1}) - V(x_t))
+$$
+
+The importance sampling weights are composed of $\rho_t,c_i$, with $\rho_t$ being weight at time $t$ and $c_i$ being weights at time from $s$ to $t$.
+
+For a real IS scheme, the weights are $c_i=\frac{\pi(a_i|x_i)}{\mu(a_i|x_i)}$.
+
+For the Vtrace scheme, the weights are truncated IS weights.
+$$
+\rho_t=\min(\bar\rho,\frac{\pi(a_t|x_t)}{\mu(a_t|x_t)}),c_i=\min(\bar c,\frac{\pi(a_i|x_i)}{\mu(a_i|x_i)})
+$$
+
+$\rho_t$ effects the fixed point that the generalized policy iteration converges to, given by the following. $c_i$ exists as an IS correction, with variance reduction technique, as in Retrace, and does not effect the convergence target.
+$$
+\pi_{\bar\rho}(a|x)=\frac{\min(\bar\rho\mu(a|x),\pi(a|x))}{\sum_b \min(\bar\rho\mu(b|x),\pi(b|x))}
+$$
+
+We will talk more about Vtrace in the Async training section.
 
 ### Curiosity Exploration \& NGU \& Agent57
 
-
 ## Async/Distributed Training
 
-### Distributed Prioritized Replay
+Rate of experience collection is often the bottleneck of DRL training. Thus, we like to have multiple actors and multiple learner, provided that the training scheme can be seperated as such, as is true for most of the cases. The actor collects experience trajectories from some CPU-bound simulation, while the learner runs the deep learning model training, which is GPU-bound. The learners are often organized in the fashion of classic deep learning distributed training, with multiple GPU worker and a centrialized parameter server. The actors are replicas of the same simulation process.
 
-### Async Actor-Critic
+An actor pulls from the learner the latest version of model params to facilitates the exploration policy. When the actor is done exploring for a while and collects a trajectory ready to be sent to the learner for model training, the learner most likely has many other trajectories at hand. The action taken at this point divides the methods into sync and async schemes. Async schemes have the model update its params as long as a batch of predetermined size of trajectories are ready, while the sync schemes wait for all the actors to send their trajectories for this period. The async schemes introduce a lag in params between the learner and the actor, while runs more efficiently on both sides.
+
+### Ape-X: Basic Distributed Async Prioritized Experience Replay
+
+Each transition trajectory in the replay buffer has a priority attached to it. Some possible ways to define the priority:
+
+- TD error: $\delta_t = r_t + \gamma_t \max_a Q(S_t,a)-Q(S_{t-1},A_{t-1})$, absolute value $|\delta_t|$ or squared $\delta_t^2$.
+
+At training time, priorities are computed or updated when one is encountered. The priorities are never updated as the model updates. Trajectories are sampled from the replay buffer according to the priority. It can be done entirely greedy, i.e. $\arg\max_i P(i)$ or stochastically, the latter being more effective, as it is more flexible. In general, the sampling distribution of the replay buffer is:
+$$
+P(i) = \frac{p_i^\alpha}{\sum_k p_k^\alpha}
+$$
+As $\alpha$ goes to infinity, the sampling of replay buffer becomes greedy according to the priority values, and converges to an one-hot vector in the end.
+
+By applying modified sampling from the replay buffer, an importance sampling weight must be also introduced. Denote prioritized sampling distribution as $\mu(i)=P(i)$ as defined above, and the original sampling distribution as $\pi(i)=\frac{1}{N}$, where $N$ is the replay buffer size. The expectation of the sampled TD error is corrected by multiplying an importance sampling weight:
+
+$$
+w_i=\frac{1}{N\cdot P(i)}
+$$
+
+The priority is computed when:
+
+- The trajectory is encountered and added to the replay buffer.
+- The trajectory is sampled from the replay buffer.
+
+To increase the rate of exploration, we have a more general weight $w_i=(\frac{1}{N\cdot P(i)})^\beta$. By setting $\beta$ other than 1, a bias is introduced to the estimated $Q$ function. We design an annealed weight, starting from some $\beta_0 \lt 1$ and reaches 1 after sufficient rounds of training. This effectively increases exploration, while removes the bias in the end.
+
+With a centuralized replay buffer at hand, the param lag introduced by async training does not bother us, as is mediated by the replay buffer.
+
+### R2D2: LSTM Ape-X
+
+### A3C: Async Actor Critic
+
+### IMPALA/V-trace
+
+See V-trace under *Off-policy Exploration*.
+
+Vtrace is designed specifically to improve Retrace, the latter being for "updating the model with trajectories both on and off policy". That is to say, Vtrace or Retrace runs on an on-policy scheme in general, but have the param lag problem with the distributed training method. This in turn makes some trajectories off-policy, since they may be collected by exploring on out-dated model params. The trajectories are on-policy *at first rough glance*, only with a minor correction needed for the Bellman target's computation.
+
+Vtrace can be used with or without a replay buffer, the latter method making the param lag worse in general, but shows better results.
 
 ## Experience Distribution
 
-### Prioritized Replay
 
 ### GDI
+
+## Doesn't Really belong Anywhere
+
+### Go-Explore
+
+Go-Explore argues that the key in learning good policies lies in the proper handling of detachment and derailment in training. Detachment means the agent does not often have trajectories leading to a *good* state, that may yield good information for trajectories that pass through it. Derailment means the agent does not often return to a *good* state. In general, Go-Explore believes that there exists *good* states in the state space, that trajectories may do well to pass through them, either originating from them, or revisiting them for multiple times.
+
+Throughout training, an archive of states are maintained. States are aggregated into *Cell*s and stored in the archive. Each cell stores one state that is most *valuable* among all the states that may be categorized into this cell. In the beginning, the archive holds only the global start state. As the agent(s) start exploring, according to a policy or entirely randomly, new states are added to the archive. For each state, there is a score associated with it. If a state is mapped to a cell, the cell is only updated when the state holds a higher score than the existing state in the cell.
+
+Training is composed of the exploration phase and the robustification phase. The exploration phase collects trajectories, while the robustification phase update the model according to the collected trajectories.
+
+In the exploration phase, the agent selects a cell in the archive with probability proportional to $W=(C_{seen}+1)^{-1/2}$. The more a cell is selected in the past, the less it is selected in the future. The state stored in the cell is restored to the simulation environment, and the agent starts exploring from that state. When a trajectory is collected, the archive would have been updated, and the agent starts all over. This is similar to the tree-based search methods.
+
+In the robustification phase, the learner uses a *backward algorithm* that is a LFD (Learn from Demonstartion) algorithm.
+
+## Useful Sites
+
+[OpenAI Paper Summary](https://spinningup.openai.com/en/latest/spinningup/keypapers.html#bonus-classic-papers-in-rl-theory-or-review)
+[Recent Paper Summary](https://github.com/yingchengyang/Reinforcement-Learning-Papers?tab=readme-ov-file#ICLR22)
